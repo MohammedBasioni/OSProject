@@ -1,4 +1,11 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class Program {
 
@@ -27,6 +34,20 @@ public class Program {
         int var1 = validateValueIsInteger(variables.get(variable1));
         int var2 = validateValueIsInteger(variables.get(variable2));
         variables.put(variable1,(var1+var2)+"");
+    }
+
+    public void writeFile(String fileName, String data) throws IOException {
+        if (variables.containsKey(data))
+            data = variables.get(data);
+        FileWriter file = new FileWriter(fileName +".txt");
+        file.write(data);
+        file.close();
+    }
+
+    public String readFile(String fileName) throws IOException {
+        String data = "";
+        data = new String(Files.readAllBytes(Paths.get(fileName+".txt")));
+        return data;
     }
 
 
