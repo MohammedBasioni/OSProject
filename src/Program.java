@@ -4,7 +4,7 @@ public class Program {
 
 
 
-    private HashMap<String,Integer> variables;
+    private HashMap<String,String> variables;
 
     public Program() {
         this.variables = new HashMap<>();
@@ -12,8 +12,8 @@ public class Program {
 
     // assign instruction
     public void assign(String name, Object value) throws OSException {
-            validateValue(value);
-            variables.put(name, (Integer) value);
+            validateValueIsString(value);
+            variables.put(name, (String) value);
     }
     // print instruction
     public void print(String name) throws OSException {
@@ -24,8 +24,12 @@ public class Program {
     public void add(String variable1, String variable2) throws OSException {
         validateExistingVariable(variable1);
         validateExistingVariable(variable2);
-        variables.put(variable1,variables.get(variable1)+variables.get(variable2));
+        int var1 = validateValueIsInteger(variables.get(variable1));
+        int var2 = validateValueIsInteger(variables.get(variable2));
+        variables.put(variable1,(var1+var2)+"");
     }
+
+
 
 
 
@@ -36,18 +40,25 @@ public class Program {
             throw new OSException("We can NOT find a variable with name: " + name+ ".");
     }
 
-    public void validateValue(Object value) throws OSException {
-        if (!(value instanceof Integer))
-            throw new OSException("The value entered is NOT a number! This instruction only supports numbers.");
+    public void validateValueIsString(Object value) throws OSException {
+        if (!(value instanceof String))
+            throw new OSException("The type of the value entered is NOT supported.");
+    }
+
+    public int validateValueIsInteger(String value) throws OSException {
+        int result;
+        try {
+            result = Integer.parseInt(value);
+        }
+        catch (Exception e) {
+            throw new OSException("The value/s of the variable/s is/are not number/s.");
+        }
+        return result;
     }
 
     // Getters and Setters
 
-    public void setVariables(HashMap<String, Integer> variables) {
-        this.variables = variables;
-    }
-
-    public HashMap<String, Integer> getVariables() {
+    public HashMap<String, String> getVariables() {
         return variables;
     }
 
