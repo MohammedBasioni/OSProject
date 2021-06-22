@@ -4,13 +4,13 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Scanner;
 
-public class Program {
+public class Process {
 
 
     private HashMap<String, String> variables;
     private String filePath;
 
-    public Program(String filePath) {
+    public Process(String filePath) {
         this.filePath = filePath;
         this.variables = new HashMap<>();
     }
@@ -112,16 +112,6 @@ public class Program {
             throw new OSException("The value/s of the variable/s is/are not number/s.");
         }
         return result;
-    }
-
-    public static void main(String[] args) throws IOException, OSException {
-        Program program1 = new Program("Program 1.txt");
-        program1.run();
-        Program program2 = new Program("Program 2.txt");
-        program2.run();
-        Program program3 = new Program("Program 3.txt");
-        program3.run();
-
     }
 
 
