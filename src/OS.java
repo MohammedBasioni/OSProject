@@ -89,9 +89,13 @@ public class OS {
 
     // print instruction
     public void print(String data, int start, int end) throws OSException {
+
         if (contains(data, start, end))
             data = fetch(data, start, end);
+        System.out.println("----------------------------------------------------------------");
         System.out.println(data);
+        System.out.println("----------------------------------------------------------------");
+
     }
 
     private String fetch(String data, int start, int end) {
