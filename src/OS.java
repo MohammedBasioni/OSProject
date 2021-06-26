@@ -11,6 +11,14 @@ public class OS {
             this.key = key;
             this.value = value;
         }
+
+        @Override
+        public String toString() {
+            return "Pair{" +
+                    "key='" + key + '\'' +
+                    ", value='" + value + '\'' +
+                    '}';
+        }
     }
 
     static Object[] memory;
@@ -20,12 +28,16 @@ public class OS {
         memory = new Object[(int) 1e5];
     }
 
-    public void setMemory(int index,Object o){
-        memory[index]=o;
+    public void setMemory(int index, Object o) {
+        System.out.println("Writting " + o + " in memory at index :" + index);
+        memory[index] = o;
     }
-    public Object getMemory(int index){
+
+    public Object getMemory(int index) {
+        System.out.println("Reading " + memory[index] + " From memory at index :" + index);
         return memory[index];
     }
+
     // assign instruction
     public void assign(String name, Object value, int start, int end) throws OSException {
         validateValueIsString(value);
@@ -37,23 +49,39 @@ public class OS {
 
     private void update(String name, String value, int start, int end) {
         for (int i = start; i <= end; i++) {
-            if (memory[i] instanceof Pair && ((Pair) memory[i]).key.equals(name)) {
-                ((Pair) memory[i]).value = value;
-                return;
+            if (memory[i] == null)
+                continue;
+            Object temp = memory[i];
+            if (temp instanceof Pair) {
+                Pair pair = (Pair) temp;
+                if (pair.key.equals(name)) {
+                    pair.value = value;
+                    setMemory(i, pair);
+                    return;
+                }
             }
         }
     }
 
     private boolean contains(String value, int start, int end) {
-        for (int i = start; i <= end; i++)
-            if (memory[i]!=null&&memory[i] instanceof Pair&&((Pair)memory[i]).key.equals(value))
-                return true;
+        for (int i = start; i <= end; i++) {
+            if (memory[i] == null)
+                continue;
+            Object temp = getMemory(i);
+            if (temp instanceof Pair) {
+                Pair pair = (Pair) temp;
+                if (pair.key.equals(value))
+                    return true;
+            }
+        }
         return false;
     }
 
     private void insert(String name, String value, int start, int end) {
         for (int i = start; i <= end; i++)
             if (memory[i] == null) {
+                Pair temp = new Pair(name, value);
+                System.out.println("Inserting " + temp + " in memory at index:" + i);
                 memory[i] = new Pair(name, value);
                 return;
             }
@@ -67,16 +95,23 @@ public class OS {
     }
 
     private String fetch(String data, int start, int end) {
-        for (int i = start; i <= end; i++)
-            if (memory[i] != null && memory[i] instanceof Pair && ((Pair) memory[i]).key.equals(data))
-                return ((Pair) memory[i]).value;
+        for (int i = start; i <= end; i++) {
+            if (memory[i] == null)
+                continue;
+            Object temp = getMemory(i);
+            if (temp instanceof Pair) {
+                Pair pair = (Pair) temp;
+                if (pair.key.equals(data))
+                    return ((Pair) memory[i]).value;
+            }
+        }
         return null;
     }
 
     // add instruction
     public void add(String variable1, String variable2, int start, int end) throws OSException {
-        validateExistingVariable(variable1,start,end);
-        validateExistingVariable(variable2,start,end);
+        validateExistingVariable(variable1, start, end);
+        validateExistingVariable(variable2, start, end);
         int var1 = validateValueIsInteger(fetch(variable1, start, end));
         int var2 = validateValueIsInteger(fetch(variable2, start, end));
         assign(variable1, (var1 + var2) + "", start, end);
@@ -100,7 +135,7 @@ public class OS {
         return data;
     }
 
-    public void run(String[] line,int start,int end) throws IOException, OSException {
+    public void run(String[] line, int start, int end) throws IOException, OSException {
         Scanner sc = new Scanner(System.in);
         switch (line[0]) {
             case "assign" -> {
@@ -108,21 +143,21 @@ public class OS {
                 if (line[2].equals("input"))
                     data = sc.nextLine();
                 else if (line[2].equals("readFile"))
-                    data = readFile(line[3],start,end);
+                    data = readFile(line[3], start, end);
                 else
                     data = line[2];
-                assign(line[1], data,start,end);
+                assign(line[1], data, start, end);
             }
-            case "print" -> print(line[1],start,end);
-            case "add" -> add(line[1], line[2],start,end);
-            case "writeFile" -> writeFile(line[1], line[2],start,end);
-            case "readFile" -> readFile(line[1],start,end);
+            case "print" -> print(line[1], start, end);
+            case "add" -> add(line[1], line[2], start, end);
+            case "writeFile" -> writeFile(line[1], line[2], start, end);
+            case "readFile" -> readFile(line[1], start, end);
         }
     }
 
     // Validations
-    public void validateExistingVariable(String name,int start,int end) throws OSException {
-        if (!contains(name,start,end))
+    public void validateExistingVariable(String name, int start, int end) throws OSException {
+        if (!contains(name, start, end))
             throw new OSException("We can NOT find a variable with name: " + name + ".");
     }
 

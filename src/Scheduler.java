@@ -18,19 +18,27 @@ public class Scheduler {
     // 27-> a,28->b
     //29,30,31,32,33,34 ->instructions
     Queue<Integer> queue;
+    Queue<Integer> runningTime;
     OS os;
 
     public Scheduler() {
         queue = new LinkedList<>();
+        runningTime=new LinkedList<>();
         os = new OS();
         queue.add(0);
+        runningTime.add(0);
         queue.add(1);
+        runningTime.add(0);
         queue.add(2);
+        runningTime.add(0);
     }
 
     public void run() throws IOException, OSException {
         while (!queue.isEmpty()) {
             int curProcess = queue.poll();
+            int time=runningTime.poll();
+            time++;
+            System.out.println("Running process "+curProcess);
             for(int i=0;i<2;i++) {
                 activateProcess(curProcess);
                 int pc = getPc(curProcess);
@@ -40,13 +48,16 @@ public class Scheduler {
                 int s = (int) os.getMemory(start), e = (int) os.getMemory(end);
                 os.run(line, s, e);
                 nextInstruction++;
-                if(nextInstruction>e)
+                if(nextInstruction>e) {
+                    System.out.println("Process "+ curProcess+" ran for "+ time+" times");
                     break;
-                else {
+                }else {
                     os.setMemory(pc,nextInstruction);
                 }
-                if(i==1)
+                if(i==1) {
                     queue.add(curProcess);
+                    runningTime.add(time);
+                }
             }
             deactivateProcess(curProcess);
         }
